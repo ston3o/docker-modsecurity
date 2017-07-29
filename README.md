@@ -15,6 +15,15 @@ Run
 docker run -d --name modsecurity -p 80:80 modsecurity
 ```
 
+Test
+---
+
+```bash
+tail -f /var/log/modsec_audit.log
+curl -i http://127.0.0.1/ -A Nessus
+wafw00f http://127.0.0.1/
+```
+
 Ressources
 ---
 

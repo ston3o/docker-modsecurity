@@ -1,9 +1,9 @@
-FROM debian:jessie
+FROM debian:stretch
 
 # Dependencies
-RUN echo "deb-src http://deb.debian.org/debian jessie main" >> /etc/apt/sources.list
+RUN echo "deb-src http://deb.debian.org/debian stretch main" >> /etc/apt/sources.list
 RUN apt-get update --fix-missing
-RUN apt-get install -y git wget build-essential libpcre3 libpcre3-dev libssl-dev libtool autoconf apache2-dev libxml2-dev libcurl4-openssl-dev automake pkgconf
+RUN apt-get install -y git wget build-essential libpcre3 libpcre3-dev libssl-dev libtool autoconf apache2-dev libxml2-dev libcurl4-openssl-dev automake pkgconf dialog
 
 # Modsecurity
 RUN git clone -b nginx_refactoring https://github.com/SpiderLabs/ModSecurity.git /opt/modsecurity && \
@@ -19,6 +19,7 @@ RUN cd /opt/nginx-* && sed -i -e 's%\./configure%./configure --add-module=/opt/m
 RUN cd /opt/nginx-* && dpkg-buildpackage -b
 RUN apt-get install -y init-system-helpers
 RUN dpkg -i /opt/nginx-common_*.deb
+RUN dpkg -i /opt/libnginx-mod-*.deb
 RUN dpkg -i /opt/nginx-full_*.deb
 
 # Enable modsecurity.conf

@@ -24,6 +24,7 @@ RUN dpkg -i /opt/nginx-full_*.deb
 # Enable modsecurity.conf
 RUN cp /opt/modsecurity/modsecurity.conf-recommended /etc/nginx/modsecurity.conf
 RUN cp /opt/modsecurity/unicode.mapping /etc/nginx/unicode.mapping
+RUN sed -i -e 's/^\s*SecRuleEngine DetectionOnly/SecRuleEngine On/' /etc/nginx/modsecurity.conf
 RUN sed -i -e 's/http {/http {\n        ModSecurityEnabled on;\n        ModSecurityConfig modsecurity.conf;/g' /etc/nginx/nginx.conf
 
 CMD ["nginx", "-g", "daemon off;"]

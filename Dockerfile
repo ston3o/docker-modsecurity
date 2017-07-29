@@ -28,4 +28,20 @@ RUN cp /opt/modsecurity/unicode.mapping /etc/nginx/unicode.mapping
 RUN sed -i -e 's/^\s*SecRuleEngine DetectionOnly/SecRuleEngine On/' /etc/nginx/modsecurity.conf
 RUN sed -i -e 's/http {/http {\n        ModSecurityEnabled on;\n        ModSecurityConfig modsecurity.conf;/g' /etc/nginx/nginx.conf
 
+# Install OWASP ModSecurity Core Rule Set
+RUN git clone https://github.com/SpiderLabs/owasp-modsecurity-crs.git /opt/owasp
+RUN cp -r /opt/owasp/rules/ /etc/nginx/
+RUN cp /opt/owasp/crs-setup.conf.example /etc/nginx/crs-setup.conf
+RUN echo 'Include crs-setup.conf' >> /etc/nginx/modsecurity.conf
+RUN echo 'Include rules/*.conf' >> /etc/nginx/modsecurity.conf
+
+# Fix bug Audit log: Failed to unlock global mutex: Permission denied
+RUN sed -i -e 's/#SecAuditLogStorageDir/SecAuditLogStorageDir/g' /etc/nginx/modsecurity.conf
+RUN sed -i -e 's/SecAuditLogType Serial/SecAuditLogType Concurrent/g' /etc/nginx/modsecurity.conf
+RUN bash -c 'mkdir -p /opt/modsecurity/var/{audit,log}'
+RUN chmod -R 777 /opt/modsecurity/var/
+
+# Cleanup
+RUN rm /opt/*.deb /opt/*.tar.gz /opt/*.tar.xz /opt/*.dsc /opt/*.buildinfo /opt/*.changes
+
 CMD ["nginx", "-g", "daemon off;"]
